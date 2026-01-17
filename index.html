@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>180DC SRCC - Consulting for Social Good</title>
+    <style>
+        /* --- COLOR PALETTE & VARIABLES --- */
+        :root {
+            --bg-cream: #EBE1D1;       /* Light Background */
+            --green-med: #41644A;      /* Secondary Green */
+            --green-dark: #0D4715;     /* Primary Dark / Footer / Header */
+            --accent-orange: #E9762B;  /* Buttons / Highlights */
+            --text-dark: #263c2c;      /* General Text */
+            --white: #ffffff;
+        }
+
+        /* --- RESET & BASICS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-cream);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* --- HEADER & NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 71, 21, 0.95); /* --green-dark with opacity */
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+            padding: 0 20px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        .logo span {
+            color: var(--accent-orange);
+        }
+
+        nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        nav a {
+            color: #d1d5db;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-orange);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-orange);
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent-orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d06015; /* Darker orange */
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(233, 118, 43, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--green-dark);
+            transform: translateY(-3px);
+        }
+
+        /* --- HERO SLIDESHOW SECTION --- */
+        .hero {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Slider Container */
+        .hero-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Dark Overlay to make text readable */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 71, 21, 0.7); /* Green Dark overlay */
+            z-index: 2;
+        }
+
+        /* Hero Content */
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease-out;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .hero .highlight {
+            color: var(--accent-orange);
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #e2e8f0;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        /* --- STATS --- */
+        .stats {
+            padding: 80px 20px;
+            background: var(--white);
+            margin-top: -60px; /* Overlap hero slightly */
+            position: relative;
+            z-index: 10;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-cream); /* Cream background for cards */
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: translateY(-10px);
+            border-color: var(--accent-orange);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent-orange);
+        }
+
+        .stat-label {
+            color: var(--green-med);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        /* --- GENERAL SECTIONS --- */
+        .section {
+            padding: 80px 20px;
+        }
+
+        .bg-gray {
+            background: var(--bg-cream); /* Matches body bg */
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            color: var(--green-dark);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--green-med);
+            margin-bottom: 60px;
+            font-size: 18px;
+        }
+
+        /* --- GRIDS & CARDS --- */
+        .grid {
+            display: grid;
+            gap: 32px;
+        }
+
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+        .card {
+            background: var(--white);
+            padding: 32px;
+            border-radius: 16px;
+            border: 2px solid rgba(65, 100, 74, 0.1);
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            border-color: var(--accent-orange);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--green-dark);
+        }
+
+        .card p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .card:hover .icon {
+            transform: scale(1.1);
+        }
+
+        /* --- INNER PAGES --- */
+        .page-hero {
+            padding: 140px 20px 80px;
+            background: var(--green-dark);
+            text-align: center;
+            color: white;
+        }
+
+        .page-hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* --- FORMS --- */
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--green-dark);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-cream);
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--green-dark);
+            color: #d1d5db;
+            padding: 60px 20px 20px;
+        }
+
+        .footer-grid h3 { color: var(--white); margin-bottom: 16px; }
+
+        .footer-grid a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .footer-grid a:hover { color: var(--accent-orange); transform: translateX(5px); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* --- MOBILE MENU --- */
+        .mobile-menu-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .mobile-menu { max-height: 0; overflow: hidden; background: var(--green-dark); transition: max-height 0.3s; }
+        .mobile-menu.active { max-height: 400px; }
+        .mobile-menu a { display: block; padding: 16px 20px; color: #d1d5db; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .mobile-menu-btn { display: block; }
+            .hero h1 { font-size: 36px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-wrapper">
+            <div class="logo" onclick="showPage('home')">bacic <span>template</span></div>
+            <nav>
+                <a href="#" class="nav-link active" data-page="home">Home</a>
+                <a href="#" class="nav-link" data-page="about">About</a>
+                <a href="#" class="nav-link" data-page="cases">Cases</a>
+                <a href="#" class="nav-link" data-page="research">Research</a>
+                <a href="#" class="nav-link" data-page="blog">Blog</a>
+                <a href="#" class="nav-link" data-page="events">Events</a>
+                <a href="#" class="nav-link" data-page="contact">Contact</a>
+            </nav>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#" data-page="home">Home</a>
+            <a href="#" data-page="about">About</a>
+            <a href="#" data-page="cases">Cases</a>
+            <a href="#" data-page="research">Research</a>
+            <a href="#" data-page="blog">Blog</a>
+            <a href="#" data-page="events">Events</a>
+            <a href="#" data-page="contact">Contact</a>
+        </div>
+    </header>
+
+    <div id="home" class="page active">
+        <section class="hero">
+            <div class="hero-slider">
+                <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1544027993-37dbfe43562a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+            </div>
+            <div class="hero-overlay"></div>
+            
+            <div class="hero-content">
+                <h1>Empowering <span class="highlight">Social Impact</span></h1>
+                <p>Strategic consulting by students, for non-profits. Driving meaningful change through data-driven insights.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="showPage('about')">Our Services →</button>
+                    <button class="btn btn-secondary" onclick="showPage('contact')">Join the Team</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats" id="statsSection">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card reveal-on-scroll">
+                        <div class="stat-number" data-target="50">0</div>
+                        <div class="stat-label">Clients Served</div>
+                    </div>
+                    <div class="stat-card reveal-on-scroll">
+                        <div class="stat-number" data-target="120">0</div>
+                        <div class="stat-label">Student Consultants</div>
+                    </div>
+                    <div class="stat-card reveal-on-scroll">
+                        <div class="stat-number" data-target="10000">0</div>
+                        <div class="stat-label">Impact Hours</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-gray">
+            <div class="container">
+                <h2 class="section-title reveal-on-scroll">Our Services</h2>
+                <p class="section-subtitle reveal-on-scroll">Comprehensive consulting solutions for social impact</p>
+                <div class="grid grid-3">
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/></svg>
+                            <h3>Strategy Development</h3>
+                            <p>Long-term strategic planning and organizational roadmapping to guide sustainable growth.</p>
+                        </div>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            <h3>Market Research</h3>
+                            <p>Data-driven insights and competitive analysis to identify opportunities and threats.</p>
+                        </div>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                            <h3>Impact Assessment</h3>
+                            <p>Measuring and optimizing social outcomes to prove value to stakeholders.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="about" class="page">
+        <div class="page-hero">
+            <h1>About Us</h1>
+            <p>Passionate students leveraging skills for social good</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-2">
+                    <div class="card reveal-on-scroll">
+                        <h3>Our Mission</h3>
+                        <p>To empower social sector organizations with world-class consulting services delivered by talented students passionate about creating positive change.</p>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <h3>Our Vision</h3>
+                        <p>A world where every social organization has access to strategic insights needed to maximize their impact.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="cases" class="page">
+        <div class="page-hero">
+            <h1>Case Library</h1>
+            <p>Frameworks, guides, and case studies</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-3">
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <h3>Market Entry Strategy</h3>
+                            <p>EdTech NGO expansion case study</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Download →</a>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <h3>Financial Sustainability</h3>
+                            <p>Framework for long-term funding</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Download →</a>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <h3>Impact Measurement</h3>
+                            <p>Comprehensive evaluation guide</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Download →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="research" class="page">
+        <div class="page-hero">
+            <h1>Research Publications</h1>
+            <p>Evidence-based insights for the social sector</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-2">
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <h3>State of Social Entrepreneurship 2025</h3>
+                            <p>Comprehensive analysis of the social enterprise landscape and funding trends across 500+ organizations.</p>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 16px;">Download PDF</button>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <h3>Digital Transformation Impact</h3>
+                            <p>Examining how technology adoption correlates with organizational performance and beneficiary outcomes.</p>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 16px;">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="blog" class="page">
+        <div class="page-hero">
+            <h1>180 Pulse</h1>
+            <p>Insights and stories from our community</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-3">
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <span style="background: var(--bg-cream); color: var(--accent-orange); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">Trends</span>
+                            <h3 style="margin-top: 12px;">5 Key Trends Shaping Social Impact</h3>
+                            <p>Exploring the forces transforming the nonprofit sector in 2026.</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Read More →</a>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <span style="background: var(--bg-cream); color: var(--accent-orange); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">Case Stories</span>
+                            <h3 style="margin-top: 12px;">Our First Healthcare Project</h3>
+                            <p>How we helped expand reach to 10,000 new beneficiaries.</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Read More →</a>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <div>
+                            <span style="background: var(--bg-cream); color: var(--accent-orange); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">How-To</span>
+                            <h3 style="margin-top: 12px;">Data Analytics for Social Good</h3>
+                            <p>How nonprofits can leverage data to measure impact.</p>
+                        </div>
+                        <a href="#" style="color: var(--accent-orange); font-weight: 600; text-decoration: none;">Read More →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="events" class="page">
+        <div class="page-hero">
+            <h1>Case 180</h1>
+            <p>Our flagship case competition</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="card reveal-on-scroll" style="max-width: 800px; margin: 0 auto;">
+                    <h3>About Case 180</h3>
+                    <p>Our annual flagship event brings together top student minds to solve pressing challenges faced by social organizations over 48 hours.</p>
+                    <button class="btn btn-primary" style="margin-top: 20px;">Register Now</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="contact" class="page">
+        <div class="page-hero">
+            <h1>Get In Touch</h1>
+            <p>Let's create impact together</p>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-2">
+                    <div class="card reveal-on-scroll">
+                        <h3>Send Us a Message</h3>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea rows="4" placeholder="Your message..."></textarea>
+                        </div>
+                        <button class="btn btn-primary">Send Message</button>
+                    </div>
+                    <div class="card reveal-on-scroll">
+                        <h3>Contact Information</h3>
+                        <p><strong>Email:</strong> contact@180dcsrcc.in</p>
+                        <p><strong>Phone:</strong> +91 98765 43210</p>
+                        <p><strong>Address:</strong> Shri Ram College of Commerce, University of Delhi, Delhi 110007</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="logo" style="margin-bottom: 16px;">180DC <span>SRCC</span></div>
+                    <p>Empowering social impact through strategic consulting excellence.</p>
+                </div>
+                <div>
+                    <h3>Quick Links</h3>
+                    <a href="#" onclick="showPage('about')">About Us</a>
+                    <a href="#" onclick="showPage('cases')">Case Library</a>
+                    <a href="#" onclick="showPage('contact')">Contact</a>
+                </div>
+                <div>
+                    <h3>Connect</h3>
+                    <p>contact@180dcsrcc.in</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 180 Degrees Consulting SRCC. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- SLIDESHOW LOGIC ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        
+        // Change image every 5 seconds
+        setInterval(nextSlide, 5000);
+
+        // --- PAGE NAVIGATION ---
+        function showPage(pageId) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
+            document.getElementById(pageId).classList.add('active');
+            
+            var links = document.querySelectorAll('.nav-link');
+            for (var j = 0; j < links.length; j++) {
+                links[j].classList.remove('active');
+            }
+            
+            var activeLinks = document.querySelectorAll('[data-page="' + pageId + '"]');
+            for (var k = 0; k < activeLinks.length; k++) {
+                if (activeLinks[k].classList.contains('nav-link')) {
+                    activeLinks[k].classList.add('active');
+                }
+            }
+            
+            window.scrollTo(0, 0);
+            
+            var mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+            }
+
+            setupScrollAnimations();
+            if(pageId === 'home') runCounterAnimation();
+        }
+
+        function toggleMenu() {
+            var mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // --- SCROLL ANIMATION ---
+        function setupScrollAnimations() {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const elements = document.querySelectorAll('.reveal-on-scroll');
+            elements.forEach(el => observer.observe(el));
+        }
+
+        // --- NUMBER COUNTER ---
+        let hasCounted = false;
+        function runCounterAnimation() {
+            const statsSection = document.getElementById('statsSection');
+            if (!statsSection) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasCounted) {
+                        hasCounted = true;
+                        const counters = document.querySelectorAll('.stat-number');
+                        counters.forEach(counter => {
+                            const target = +counter.getAttribute('data-target');
+                            const duration = 2000;
+                            const increment = target / (duration / 16);
+                            let current = 0;
+                            const updateCounter = () => {
+                                current += increment;
+                                if (current < target) {
+                                    counter.innerText = Math.ceil(current) + (target > 100 ? '+' : '');
+                                    requestAnimationFrame(updateCounter);
+                                } else {
+                                    counter.innerText = target + '+';
+                                }
+                            };
+                            updateCounter();
+                        });
+                    }
+                });
+            });
+            observer.observe(statsSection);
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', function() {
+            var menuBtn = document.getElementById('menuBtn');
+            if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+
+            var allLinks = document.querySelectorAll('[data-page]');
+            for (var i = 0; i < allLinks.length; i++) {
+                allLinks[i].addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var pageId = this.getAttribute('data-page');
+                    showPage(pageId);
+                });
+            }
+
+            setupScrollAnimations();
+            runCounterAnimation();
+        });
+    </script>
+</body>
+</html>
